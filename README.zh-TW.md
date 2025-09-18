@@ -252,3 +252,4 @@ python3 interactive_vultr_test.py
 - [simple_netcheck.py 說明文件](simple_netcheck.md)
 - [interactive_vultr_test.py 說明文件](interactive_vultr_test.md)
 - [English README](README.md)
+- [Japanese README](README.ja.md)

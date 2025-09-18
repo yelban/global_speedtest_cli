@@ -252,3 +252,4 @@ This project is open source. Please check the license file for details.
 - [simple_netcheck.py Documentation](simple_netcheck.md)
 - [interactive_vultr_test.py Documentation](interactive_vultr_test.md)
 - [Traditional Chinese README](README.zh-TW.md)
+- [Japanese README](README.ja.md)
