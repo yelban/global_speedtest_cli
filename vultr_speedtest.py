@@ -17,20 +17,224 @@ import threading
 import subprocess
 import signal
 
+# 多語言支持
+LANGUAGES = {
+    "en": {
+        "title": "🚀 Vultr Global Speed Test",
+        "description": "Network speed test using Vultr datacenter test files",
+        "available_servers": "Available speed test servers:",
+        "taiwan_hinet": "TAIWAN HINET:",
+        "linode_global": "LINODE GLOBAL:",
+        "vultr_global": "VULTR GLOBAL:",
+        "testing_server": "[INFO] Testing",
+        "testing_latency": "Testing latency...",
+        "testing_download": "Testing download speed...",
+        "file_size": "File size",
+        "ping": "ping",
+        "download": "download",
+        "test_failed": "Test failed",
+        "unknown_error": "Unknown error",
+        "interrupted": "⏹️  Testing interrupted by user",
+        "completed_tests": "completed",
+        "no_tests": "❌ No tests completed, exiting",
+        "successful_tests": "Successfully tested",
+        "servers": "servers",
+        "avg_download_speed": "Average download speed",
+        "starting_test": "Starting test for",
+        "invalid_server_keys": "Invalid server keys",
+        "use_list_to_see": "Use --list to see all available servers",
+        "please_specify": "Please specify servers to test, use --help for usage",
+        "result_saved_to": "[INFO] Results saved to",
+        "connection_error": "Connection error",
+        "test_timeout": "Test duration too short",
+        "server_not_found": "Server not found"
+    },
+    "zh": {
+        "title": "🚀 Vultr 全球機房網路速度測試",
+        "description": "透過下載 Vultr 機房測試檔案來測試網路速度",
+        "available_servers": "可用的測速伺服器:",
+        "taiwan_hinet": "TAIWAN HINET:",
+        "linode_global": "LINODE GLOBAL:",
+        "vultr_global": "VULTR GLOBAL:",
+        "testing_server": "[INFO] 測試",
+        "testing_latency": "正在測試延遲...",
+        "testing_download": "正在測試下載速度...",
+        "file_size": "檔案大小",
+        "ping": "ping",
+        "download": "↓",
+        "test_failed": "測試失敗",
+        "unknown_error": "未知錯誤",
+        "interrupted": "⏹️  測試被使用者中斷",
+        "completed_tests": "已完成",
+        "no_tests": "❌ 沒有完成任何測試，程式結束",
+        "successful_tests": "成功測試",
+        "servers": "個伺服器",
+        "avg_download_speed": "平均下載速度",
+        "starting_test": "開始測試",
+        "invalid_server_keys": "無效的伺服器鍵值",
+        "use_list_to_see": "使用 --list 查看所有可用伺服器",
+        "please_specify": "請指定要測試的伺服器，使用 --help 查看使用說明",
+        "result_saved_to": "[INFO] 結果已儲存至",
+        "connection_error": "連接錯誤",
+        "test_timeout": "測試時間過短",
+        "server_not_found": "找不到伺服器"
+    },
+    "ja": {
+        "title": "🚀 Vultr グローバルスピードテスト",
+        "description": "Vultr データセンターのテストファイルを使用したネットワーク速度テスト",
+        "available_servers": "利用可能な速度テストサーバー:",
+        "taiwan_hinet": "TAIWAN HINET:",
+        "linode_global": "LINODE GLOBAL:",
+        "vultr_global": "VULTR GLOBAL:",
+        "testing_server": "[INFO] テスト中",
+        "testing_latency": "レイテンシをテスト中...",
+        "testing_download": "ダウンロード速度をテスト中...",
+        "file_size": "ファイルサイズ",
+        "ping": "ping",
+        "download": "↓",
+        "test_failed": "テスト失敗",
+        "unknown_error": "不明なエラー",
+        "interrupted": "⏹️  ユーザーによってテストが中断されました",
+        "completed_tests": "完了",
+        "no_tests": "❌ テストが完了しませんでした。プログラムを終了します",
+        "successful_tests": "成功したテスト",
+        "servers": "サーバー",
+        "avg_download_speed": "平均ダウンロード速度",
+        "starting_test": "テスト開始",
+        "invalid_server_keys": "無効なサーバーキー",
+        "use_list_to_see": "--list を使用してすべての利用可能なサーバーを表示",
+        "please_specify": "テストするサーバーを指定してください。使用方法は --help を参照",
+        "result_saved_to": "[INFO] 結果を保存しました",
+        "connection_error": "接続エラー",
+        "test_timeout": "テスト時間が短すぎます",
+        "server_not_found": "サーバーが見つかりません"
+    }
+}
+
+def get_text(key: str, lang: str = "en") -> str:
+    """Get localized text based on language"""
+    return LANGUAGES.get(lang, LANGUAGES["en"]).get(key, LANGUAGES["en"][key])
+
+def get_server_name(server: Dict[str, Any], lang: str = "en") -> str:
+    """Get localized server name"""
+    if "names" in server:
+        return server["names"].get(lang, server["names"].get("en", "Unknown"))
+    else:
+        # Fallback for old format
+        return server.get("name", "Unknown")
+
 # 台灣 HiNet 測速伺服器
 HINET_SERVERS = {
     "taiwan": {
         "hinet_250m": {
-            "name": "台灣-HiNet (250MB)",
+            "names": {"en": "Taiwan-HiNet (250MB)", "zh": "台灣-HiNet (250MB)", "ja": "台湾-HiNet (250MB)"},
             "host": "http.speed.hinet.net",
             "test_url": "http://http.speed.hinet.net/test_250m.zip",
             "file_size": "250MB"
         },
         "hinet_2g": {
-            "name": "台灣-HiNet (2GB)",
+            "names": {"en": "Taiwan-HiNet (2GB)", "zh": "台灣-HiNet (2GB)", "ja": "台湾-HiNet (2GB)"},
             "host": "http.speed.hinet.net",
             "test_url": "http://http.speed.hinet.net/test_2048m.zip",
             "file_size": "2GB"
+        }
+    }
+}
+
+# Linode 全球測速伺服器
+LINODE_SERVERS = {
+    "asia": {
+        "tokyo2": {
+            "names": {"en": "Japan-Tokyo 2", "zh": "日本-東京 2", "ja": "日本-東京 2"},
+            "host": "speedtest.tokyo2.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.tokyo2.linode.com/100MB-tokyo2.bin",
+                "1GB": "https://speedtest.tokyo2.linode.com/1GB-tokyo2.bin"
+            }
+        },
+        "tokyo3": {
+            "names": {"en": "Japan-Tokyo 3", "zh": "日本-東京 3", "ja": "日本-東京 3"},
+            "host": "jp-tyo-3.speedtest.linode.com",
+            "test_urls": {
+                "100MB": "https://jp-tyo-3.speedtest.linode.com/100MB-tokyo3.bin",
+                "1GB": "https://jp-tyo-3.speedtest.linode.com/1GB-tokyo3.bin"
+            }
+        },
+        "singapore": {
+            "names": {"en": "Singapore", "zh": "新加坡", "ja": "シンガポール"},
+            "host": "speedtest.singapore.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.singapore.linode.com/100MB-singapore.bin",
+                "1GB": "https://speedtest.singapore.linode.com/1GB-singapore.bin"
+            }
+        },
+        "mumbai": {
+            "names": {"en": "India-Mumbai", "zh": "印度-孟買", "ja": "インド-ムンバイ"},
+            "host": "speedtest.mumbai1.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.mumbai1.linode.com/100MB-mumbai.bin",
+                "1GB": "https://speedtest.mumbai1.linode.com/1GB-mumbai.bin"
+            }
+        }
+    },
+    "north_america": {
+        "fremont": {
+            "names": {"en": "USA-Fremont", "zh": "美國-弗里蒙特", "ja": "米国-フリーモント"},
+            "host": "speedtest.fremont.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.fremont.linode.com/100MB-fremont.bin",
+                "1GB": "https://speedtest.fremont.linode.com/1GB-fremont.bin"
+            }
+        },
+        "newark": {
+            "names": {"en": "USA-Newark", "zh": "美國-紐瓦克", "ja": "米国-ニューアーク"},
+            "host": "speedtest.newark.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.newark.linode.com/100MB-newark.bin",
+                "1GB": "https://speedtest.newark.linode.com/1GB-newark.bin"
+            }
+        },
+        "atlanta": {
+            "names": {"en": "USA-Atlanta", "zh": "美國-亞特蘭大", "ja": "米国-アトランタ"},
+            "host": "speedtest.atlanta.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.atlanta.linode.com/100MB-atlanta.bin",
+                "1GB": "https://speedtest.atlanta.linode.com/1GB-atlanta.bin"
+            }
+        },
+        "dallas": {
+            "names": {"en": "USA-Dallas", "zh": "美國-達拉斯", "ja": "米国-ダラス"},
+            "host": "speedtest.dallas.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.dallas.linode.com/100MB-dallas.bin",
+                "1GB": "https://speedtest.dallas.linode.com/1GB-dallas.bin"
+            }
+        },
+        "toronto": {
+            "names": {"en": "Canada-Toronto", "zh": "加拿大-多倫多", "ja": "カナダ-トロント"},
+            "host": "speedtest.toronto1.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.toronto1.linode.com/100MB-toronto.bin",
+                "1GB": "https://speedtest.toronto1.linode.com/1GB-toronto.bin"
+            }
+        }
+    },
+    "europe": {
+        "london": {
+            "names": {"en": "UK-London", "zh": "英國-倫敦", "ja": "英国-ロンドン"},
+            "host": "speedtest.london.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.london.linode.com/100MB-london.bin",
+                "1GB": "https://speedtest.london.linode.com/1GB-london.bin"
+            }
+        },
+        "frankfurt": {
+            "names": {"en": "Germany-Frankfurt", "zh": "德國-法蘭克福", "ja": "ドイツ-フランクフルト"},
+            "host": "speedtest.frankfurt.linode.com",
+            "test_urls": {
+                "100MB": "https://speedtest.frankfurt.linode.com/100MB-frankfurt.bin",
+                "1GB": "https://speedtest.frankfurt.linode.com/1GB-frankfurt.bin"
+            }
         }
     }
 }
@@ -39,172 +243,172 @@ HINET_SERVERS = {
 VULTR_SERVERS = {
     "asia": {
         "tokyo": {
-            "name": "日本-東京",
+            "names": {"en": "Japan-Tokyo", "zh": "日本-東京", "ja": "日本-東京"},
             "host": "hnd-jp-ping.vultr.com",
             "ip": "108.61.201.151"
         },
         "osaka": {
-            "name": "日本-大阪",
+            "names": {"en": "Japan-Osaka", "zh": "日本-大阪", "ja": "日本-大阪"},
             "host": "osk-jp-ping.vultr.com",
             "ip": "64.176.34.94"
         },
         "seoul": {
-            "name": "韓國-首爾",
+            "names": {"en": "South Korea-Seoul", "zh": "韓國-首爾", "ja": "韓国-ソウル"},
             "host": "sel-kor-ping.vultr.com",
             "ip": "141.164.34.61"
         },
         "singapore": {
-            "name": "新加坡",
+            "names": {"en": "Singapore", "zh": "新加坡", "ja": "シンガポール"},
             "host": "sgp-ping.vultr.com",
             "ip": "45.32.100.168"
         },
         "bangalore": {
-            "name": "印度-班加羅爾",
+            "names": {"en": "India-Bangalore", "zh": "印度-班加羅爾", "ja": "インド-バンガロール"},
             "host": "blr-in-ping.vultr.com",
             "ip": "139.84.130.100"
         },
         "delhi": {
-            "name": "印度-德里NCR",
+            "names": {"en": "India-Delhi NCR", "zh": "印度-德里NCR", "ja": "インド-デリー"},
             "host": "del-in-ping.vultr.com",
             "ip": "139.84.162.104"
         },
         "mumbai": {
-            "name": "印度-孟買",
+            "names": {"en": "India-Mumbai", "zh": "印度-孟買", "ja": "インド-ムンバイ"},
             "host": "bom-in-ping.vultr.com",
             "ip": "65.20.66.100"
         },
         "tel_aviv": {
-            "name": "以色列-特拉維夫",
+            "names": {"en": "Israel-Tel Aviv", "zh": "以色列-特拉維夫", "ja": "イスラエル-テルアビブ"},
             "host": "tlv-il-ping.vultr.com",
             "ip": "64.176.162.16"
         }
     },
     "europe": {
         "london": {
-            "name": "英國-倫敦",
+            "names": {"en": "UK-London", "zh": "英國-倫敦", "ja": "イギリス-ロンドン"},
             "host": "lon-gb-ping.vultr.com",
             "ip": "108.61.196.101"
         },
         "manchester": {
-            "name": "英國-曼徹斯特",
+            "names": {"en": "UK-Manchester", "zh": "英國-曼徹斯特", "ja": "イギリス-マンチェスター"},
             "host": "man-uk-ping.vultr.com",
             "ip": "64.176.178.136"
         },
         "frankfurt": {
-            "name": "德國-法蘭克福",
+            "names": {"en": "Germany-Frankfurt", "zh": "德國-法蘭克福", "ja": "ドイツ-フランクフルト"},
             "host": "fra-de-ping.vultr.com",
             "ip": "108.61.210.117"
         },
         "paris": {
-            "name": "法國-巴黎",
+            "names": {"en": "France-Paris", "zh": "法國-巴黎", "ja": "フランス-パリ"},
             "host": "par-fr-ping.vultr.com",
             "ip": "108.61.209.127"
         },
         "amsterdam": {
-            "name": "荷蘭-阿姆斯特丹",
+            "names": {"en": "Netherlands-Amsterdam", "zh": "荷蘭-阿姆斯特丹", "ja": "オランダ-アムステルダム"},
             "host": "ams-nl-ping.vultr.com",
             "ip": "108.61.198.102"
         },
         "warsaw": {
-            "name": "波蘭-華沙",
+            "names": {"en": "Poland-Warsaw", "zh": "波蘭-華沙", "ja": "ポーランド-ワルシャワ"},
             "host": "waw-pl-ping.vultr.com",
             "ip": "70.34.242.24"
         },
         "stockholm": {
-            "name": "瑞典-斯德哥爾摩",
+            "names": {"en": "Sweden-Stockholm", "zh": "瑞典-斯德哥爾摩", "ja": "スウェーデン-ストックホルム"},
             "host": "sto-se-ping.vultr.com",
             "ip": "70.34.194.86"
         },
         "madrid": {
-            "name": "西班牙-馬德里",
+            "names": {"en": "Spain-Madrid", "zh": "西班牙-馬德里", "ja": "スペイン-マドリード"},
             "host": "mad-es-ping.vultr.com",
             "ip": "208.76.222.30"
         }
     },
     "north_america": {
         "atlanta": {
-            "name": "美國-亞特蘭大",
+            "names": {"en": "USA-Atlanta", "zh": "美國-亞特蘭大", "ja": "アメリカ-アトランタ"},
             "host": "ga-us-ping.vultr.com",
             "ip": "108.61.193.166"
         },
         "chicago": {
-            "name": "美國-芝加哥",
+            "names": {"en": "USA-Chicago", "zh": "美國-芝加哥", "ja": "アメリカ-シカゴ"},
             "host": "il-us-ping.vultr.com",
             "ip": "107.191.51.12"
         },
         "dallas": {
-            "name": "美國-達拉斯",
+            "names": {"en": "USA-Dallas", "zh": "美國-達拉斯", "ja": "アメリカ-ダラス"},
             "host": "tx-us-ping.vultr.com",
             "ip": "108.61.224.175"
         },
         "honolulu": {
-            "name": "美國-火奴魯魯",
+            "names": {"en": "USA-Honolulu", "zh": "美國-火奴魯魯", "ja": "アメリカ-ホノルル"},
             "host": "hon-hi-us-ping.vultr.com",
             "ip": "208.72.154.76"
         },
         "los_angeles": {
-            "name": "美國-洛杉磯",
+            "names": {"en": "USA-Los Angeles", "zh": "美國-洛杉磯", "ja": "アメリカ-ロサンゼルス"},
             "host": "lax-ca-us-ping.vultr.com",
             "ip": "108.61.219.200"
         },
         "miami": {
-            "name": "美國-邁阿密",
+            "names": {"en": "USA-Miami", "zh": "美國-邁阿密", "ja": "アメリカ-マイアミ"},
             "host": "fl-us-ping.vultr.com",
             "ip": "104.156.244.232"
         },
         "new_york": {
-            "name": "美國-紐約",
+            "names": {"en": "USA-New York", "zh": "美國-紐約", "ja": "アメリカ-ニューヨーク"},
             "host": "nj-us-ping.vultr.com",
             "ip": "108.61.149.182"
         },
         "seattle": {
-            "name": "美國-西雅圖",
+            "names": {"en": "USA-Seattle", "zh": "美國-西雅圖", "ja": "アメリカ-シアトル"},
             "host": "wa-us-ping.vultr.com",
             "ip": "108.61.194.105"
         },
         "silicon_valley": {
-            "name": "美國-硅谷",
+            "names": {"en": "USA-Silicon Valley", "zh": "美國-硅谷", "ja": "アメリカ-シリコンバレー"},
             "host": "sjo-ca-us-ping.vultr.com",
             "ip": "104.156.230.107"
         },
         "toronto": {
-            "name": "加拿大-多倫多",
+            "names": {"en": "Canada-Toronto", "zh": "加拿大-多倫多", "ja": "カナダ-トロント"},
             "host": "tor-ca-ping.vultr.com",
             "ip": "149.248.50.81"
         },
         "mexico_city": {
-            "name": "墨西哥-墨西哥城",
+            "names": {"en": "Mexico-Mexico City", "zh": "墨西哥-墨西哥城", "ja": "メキシコ-メキシコシティ"},
             "host": "mex-mx-ping.vultr.com",
             "ip": "216.238.66.16"
         }
     },
     "south_america": {
         "sao_paulo": {
-            "name": "巴西-聖保羅",
+            "names": {"en": "Brazil-São Paulo", "zh": "巴西-聖保羅", "ja": "ブラジル-サンパウロ"},
             "host": "sao-br-ping.vultr.com",
             "ip": "216.238.98.118"
         },
         "santiago": {
-            "name": "智利-聖地牙哥",
+            "names": {"en": "Chile-Santiago", "zh": "智利-聖地牙哥", "ja": "チリ-サンティアゴ"},
             "host": "scl-cl-ping.vultr.com",
             "ip": "64.176.2.7"
         }
     },
     "africa": {
         "johannesburg": {
-            "name": "南非-約翰內斯堡",
+            "names": {"en": "South Africa-Johannesburg", "zh": "南非-約翰內斯堡", "ja": "南アフリカ-ヨハネスブルグ"},
             "host": "jnb-za-ping.vultr.com",
             "ip": "139.84.226.78"
         }
     },
     "oceania": {
         "melbourne": {
-            "name": "澳大利亞-墨爾本",
+            "names": {"en": "Australia-Melbourne", "zh": "澳大利亞-墨爾本", "ja": "オーストラリア-メルボルン"},
             "host": "mel-au-ping.vultr.com",
             "ip": "67.219.110.24"
         },
         "sydney": {
-            "name": "澳大利亞-雪梨",
+            "names": {"en": "Australia-Sydney", "zh": "澳大利亞-雪梨", "ja": "オーストラリア-シドニー"},
             "host": "syd-au-ping.vultr.com",
             "ip": "108.61.212.117"
         }
@@ -245,7 +449,7 @@ class SpeedTest:
         except Exception:
             return -1
 
-    def download_test(self, host: str, test_size: str = "100MB", show_progress: bool = True, quick_test: bool = False, custom_url: str = None) -> Dict[str, Any]:
+    def download_test(self, host: str, test_size: str = "100MB", show_progress: bool = True, quick_test: bool = False, custom_url: str = None, lang: str = "en") -> Dict[str, Any]:
         """下載速度測試"""
         if custom_url:
             test_url = custom_url
@@ -284,7 +488,7 @@ class SpeedTest:
                         total_size = 100 * 1024 * 1024  # 100MB fallback
 
                 if show_progress:
-                    print(f"    檔案大小: {total_size / 1024 / 1024:.1f} MB")
+                    print(f"    {get_text('file_size', lang)}: {total_size / 1024 / 1024:.1f} MB")
                     print("    ", end="", flush=True)
 
                 # 下載資料並計算速度
@@ -342,15 +546,48 @@ class SpeedTest:
                     "test_url": test_url
                 }
             else:
-                return {"success": False, "error": "測試時間過短"}
+                return {"success": False, "error": get_text("test_timeout", lang)}
 
         except KeyboardInterrupt:
             # 重新拋出 KeyboardInterrupt 讓上層處理
             raise
         except urllib.error.URLError as e:
-            return {"success": False, "error": f"連接錯誤: {e}"}
+            return {"success": False, "error": f"{get_text('connection_error', lang)}: {e}"}
         except Exception as e:
-            return {"success": False, "error": f"測試失敗: {e}"}
+            return {"success": False, "error": f"{get_text('test_failed', lang)}: {e}"}
+
+def get_server_by_key_with_zone(key: str, zone: str = None) -> Optional[Dict[str, str]]:
+    """根據鍵值和指定區域獲取伺服器資訊"""
+    if zone:
+        # 如果指定了區域，只在該區域查找
+        if zone == "hinet":
+            for region, servers in HINET_SERVERS.items():
+                if key in servers:
+                    server = servers[key].copy()
+                    server["key"] = key
+                    server["region"] = region
+                    server["provider"] = "hinet"
+                    return server
+        elif zone == "linode":
+            for region, servers in LINODE_SERVERS.items():
+                if key in servers:
+                    server = servers[key].copy()
+                    server["key"] = key
+                    server["region"] = region
+                    server["provider"] = "linode"
+                    return server
+        elif zone == "vultr":
+            for region, servers in VULTR_SERVERS.items():
+                if key in servers:
+                    server = servers[key].copy()
+                    server["key"] = key
+                    server["region"] = region
+                    server["provider"] = "vultr"
+                    return server
+        return None
+    else:
+        # 如果沒指定區域，使用預設順序
+        return get_server_by_key(key)
 
 def get_server_by_key(key: str) -> Optional[Dict[str, str]]:
     """根據鍵值獲取伺服器資訊"""
@@ -363,6 +600,15 @@ def get_server_by_key(key: str) -> Optional[Dict[str, str]]:
             server["provider"] = "hinet"
             return server
 
+    # 檢查 Linode 伺服器
+    for region, servers in LINODE_SERVERS.items():
+        if key in servers:
+            server = servers[key].copy()
+            server["key"] = key
+            server["region"] = region
+            server["provider"] = "linode"
+            return server
+
     # 再檢查 Vultr 伺服器
     for region, servers in VULTR_SERVERS.items():
         if key in servers:
@@ -373,53 +619,69 @@ def get_server_by_key(key: str) -> Optional[Dict[str, str]]:
             return server
     return None
 
-def list_all_servers():
+def list_all_servers(lang: str = "en"):
     """列出所有可用的伺服器"""
-    print("可用的測速伺服器:")
+    print(get_text("available_servers", lang))
     print("=" * 50)
 
     # 顯示 HiNet 伺服器
-    print("\nTAIWAN HINET:")
+    print(f"\n{get_text('taiwan_hinet', lang)}")
     for region, servers in HINET_SERVERS.items():
         for key, server in servers.items():
-            print(f"  {key:<15} - {server['name']}")
+            server_name = get_server_name(server, lang)
+            print(f"  {key:<15} - {server_name}")
+
+    # 顯示 Linode 伺服器
+    print(f"\n{get_text('linode_global', lang)}")
+    for region, servers in LINODE_SERVERS.items():
+        print(f"\n{region.upper().replace('_', ' ')}:")
+        for key, server in servers.items():
+            server_name = get_server_name(server, lang)
+            print(f"  {key:<15} - {server_name}")
 
     # 顯示 Vultr 伺服器
-    print(f"\nVULTR GLOBAL:")
+    print(f"\n{get_text('vultr_global', lang)}")
     for region, servers in VULTR_SERVERS.items():
         print(f"\n{region.upper().replace('_', ' ')}:")
         for key, server in servers.items():
-            print(f"  {key:<15} - {server['name']}")
+            server_name = get_server_name(server, lang)
+            print(f"  {key:<15} - {server_name}")
 
-def test_single_server(key: str, test_size: str = "100MB", show_progress: bool = True, quick_test: bool = False) -> Dict[str, Any]:
+def test_single_server(key: str, test_size: str = "100MB", show_progress: bool = True, quick_test: bool = False, lang: str = "en", zone: str = None) -> Dict[str, Any]:
     """測試單一伺服器"""
-    server = get_server_by_key(key)
+    server = get_server_by_key_with_zone(key, zone)
     if not server:
-        return {"success": False, "error": f"找不到伺服器: {key}"}
+        zone_info = f" in zone '{zone}'" if zone else ""
+        return {"success": False, "error": f"{get_text('server_not_found', lang)}: {key}{zone_info}"}
 
     try:
-        print(f"[INFO] 測試 {server['name']} ({server['host']})...")
+        server_name = get_server_name(server, lang)
+        print(f"{get_text('testing_server', lang)} {server_name} ({server['host']})...")
 
         speed_test = SpeedTest()
 
         # Ping 測試
         if show_progress:
-            print("    正在測試延遲...")
+            print(f"    {get_text('testing_latency', lang)}")
         ping_ms = speed_test.ping_test(server["host"])
 
         # 下載測試
         if show_progress:
-            print("    正在測試下載速度...")
+            print(f"    {get_text('testing_download', lang)}")
 
-        # 檢查是否為 HiNet 伺服器，使用自訂 URL
+        # 檢查不同提供商的伺服器，使用對應的測試 URL
         if server.get("provider") == "hinet":
-            download_result = speed_test.download_test(server["host"], test_size, show_progress, quick_test, server.get("test_url"))
+            download_result = speed_test.download_test(server["host"], test_size, show_progress, quick_test, server.get("test_url"), lang)
+        elif server.get("provider") == "linode":
+            # Linode 伺服器使用 test_urls 中對應大小的 URL
+            test_url = server.get("test_urls", {}).get(test_size)
+            download_result = speed_test.download_test(server["host"], test_size, show_progress, quick_test, test_url, lang)
         else:
-            download_result = speed_test.download_test(server["host"], test_size, show_progress, quick_test)
+            download_result = speed_test.download_test(server["host"], test_size, show_progress, quick_test, None, lang)
 
         result = {
             "server_key": key,
-            "server_name": server["name"],
+            "server_name": server_name,
             "server_host": server["host"],
             "server_ip": server.get("ip", "N/A"),
             "region": server["region"],
@@ -444,58 +706,62 @@ def test_single_server(key: str, test_size: str = "100MB", show_progress: bool =
         raise
 
 def test_multiple_servers(server_keys: List[str], test_size: str = "100MB",
-                         cooldown: float = 2.0, show_progress: bool = True, quick_test: bool = False) -> List[Dict[str, Any]]:
+                         cooldown: float = 2.0, show_progress: bool = True, quick_test: bool = False, lang: str = "en", zone: str = None) -> List[Dict[str, Any]]:
     """測試多個伺服器"""
     results = []
 
     try:
         for i, key in enumerate(server_keys):
-            result = test_single_server(key, test_size, show_progress, quick_test)
+            result = test_single_server(key, test_size, show_progress, quick_test, lang, zone)
             results.append(result)
 
             # 顯示結果
             if "download_mbps" in result:
                 print(f"{result['server_name']}: "
-                      f"↓ {result['download_mbps']:.1f} Mbps | "
-                      f"ping {result['ping_ms']:.1f} ms")
+                      f"{get_text('download', lang)} {result['download_mbps']:.1f} Mbps | "
+                      f"{get_text('ping', lang)} {result['ping_ms']:.1f} ms")
             else:
-                print(f"{result['server_name']}: 測試失敗 - {result.get('error', '未知錯誤')}")
+                print(f"{result['server_name']}: {get_text('test_failed', lang)} - {result.get('error', get_text('unknown_error', lang))}")
 
             # 等待間隔（除了最後一個）
             if i < len(server_keys) - 1 and cooldown > 0:
                 time.sleep(cooldown)
 
     except KeyboardInterrupt:
-        print(f"\n\n⏹️  測試被使用者中斷 (已完成 {len(results)}/{len(server_keys)} 個測試)")
+        print(f"\n\n{get_text('interrupted', lang)} ({len(results)}/{len(server_keys)} {get_text('completed_tests', lang)})")
         if len(results) == 0:
-            print("❌ 沒有完成任何測試，程式結束")
+            print(get_text('no_tests', lang))
             return results
 
     return results
 
 def main():
-    parser = argparse.ArgumentParser(description="Vultr 全球機房網路速度測試工具")
-    parser.add_argument("--server", "-s", help="測試指定伺服器 (使用 --list 查看可用伺服器)")
-    parser.add_argument("--servers", nargs="+", help="測試多個指定伺服器")
-    parser.add_argument("--default", action="store_true", help="測試預設伺服器組合")
-    parser.add_argument("--all", action="store_true", help="測試所有伺服器")
-    parser.add_argument("--list", action="store_true", help="列出所有可用伺服器")
+    parser = argparse.ArgumentParser(description="Vultr Global Speed Test Tool")
+    parser.add_argument("--server", "-s", help="Test specific server (use --list to see available servers)")
+    parser.add_argument("--zone", choices=["vultr", "linode", "hinet"],
+                       help="Specify provider zone (vultr/linode/hinet). When server key conflicts, this determines which provider to use.")
+    parser.add_argument("--servers", nargs="+", help="Test multiple specific servers")
+    parser.add_argument("--default", action="store_true", help="Test default server combination")
+    parser.add_argument("--all", action="store_true", help="Test all servers")
+    parser.add_argument("--list", action="store_true", help="List all available servers")
     parser.add_argument("--size", default="100MB", choices=["100MB", "1GB"],
-                       help="測試檔案大小 (預設: 100MB)")
+                       help="Test file size (default: 100MB)")
     parser.add_argument("--cooldown", type=float, default=2.0,
-                       help="測試間隔秒數 (預設: 2.0)")
-    parser.add_argument("--output", help="將結果儲存為 JSON 檔案")
+                       help="Test interval in seconds (default: 2.0)")
+    parser.add_argument("--output", help="Save results as JSON file")
     parser.add_argument("--timeout", type=int, default=30,
-                       help="單次測試超時秒數 (預設: 30)")
+                       help="Single test timeout in seconds (default: 30)")
     parser.add_argument("--no-progress", action="store_true",
-                       help="不顯示進度條")
+                       help="Do not show progress bar")
     parser.add_argument("--quick", action="store_true",
-                       help="快速測試模式 (部分下載，預設為完整下載)")
+                       help="Quick test mode (partial download, default is full download)")
+    parser.add_argument("--lang", choices=["en", "zh", "ja"], default="en",
+                       help="Display language: en(English), zh(Traditional Chinese), ja(Japanese)")
 
     args = parser.parse_args()
 
     if args.list:
-        list_all_servers()
+        list_all_servers(args.lang)
         return
 
     # 決定要測試的伺服器
@@ -510,41 +776,45 @@ def main():
         # 加入 HiNet 伺服器
         for region, servers in HINET_SERVERS.items():
             server_keys.extend(servers.keys())
+        # 加入 Linode 伺服器
+        for region, servers in LINODE_SERVERS.items():
+            server_keys.extend(servers.keys())
         # 加入 Vultr 伺服器
         for region, servers in VULTR_SERVERS.items():
             server_keys.extend(servers.keys())
     else:
-        print("請指定要測試的伺服器，使用 --help 查看使用說明")
+        print(get_text("please_specify", args.lang))
         return
 
     # 驗證伺服器鍵值
-    invalid_keys = [key for key in server_keys if get_server_by_key(key) is None]
+    invalid_keys = [key for key in server_keys if get_server_by_key_with_zone(key, args.zone) is None]
     if invalid_keys:
-        print(f"無效的伺服器鍵值: {invalid_keys}")
-        print("使用 --list 查看所有可用伺服器")
+        zone_info = f" in zone '{args.zone}'" if args.zone else ""
+        print(f"{get_text('invalid_server_keys', args.lang)}: {invalid_keys}{zone_info}")
+        print(get_text("use_list_to_see", args.lang))
         return
 
-    print(f"開始測試 {len(server_keys)} 個伺服器...")
+    print(f"{get_text('starting_test', args.lang)} {len(server_keys)} {get_text('servers', args.lang)}...")
     print("=" * 50)
 
     # 執行測試
     SpeedTest.timeout = args.timeout
     show_progress = not args.no_progress
     quick_test = args.quick
-    results = test_multiple_servers(server_keys, args.size, args.cooldown, show_progress, quick_test)
+    results = test_multiple_servers(server_keys, args.size, args.cooldown, show_progress, quick_test, args.lang, args.zone)
 
     # 儲存結果
     if args.output:
         with open(args.output, 'w', encoding='utf-8') as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
-        print(f"\n[INFO] 結果已儲存至 {args.output}")
+        print(f"\n{get_text('result_saved_to', args.lang)} {args.output}")
 
     # 顯示摘要
     successful_tests = [r for r in results if "download_mbps" in r]
     if successful_tests:
-        print(f"\n成功測試 {len(successful_tests)}/{len(results)} 個伺服器")
+        print(f"\n{get_text('successful_tests', args.lang)} {len(successful_tests)}/{len(results)} {get_text('servers', args.lang)}")
         avg_speed = sum(r["download_mbps"] for r in successful_tests) / len(successful_tests)
-        print(f"平均下載速度: {avg_speed:.1f} Mbps")
+        print(f"{get_text('avg_download_speed', args.lang)}: {avg_speed:.1f} Mbps")
 
 if __name__ == "__main__":
     main()

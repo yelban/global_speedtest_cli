@@ -25,7 +25,7 @@ A lightweight network connectivity tester that measures connection performance t
 - No external dependencies required
 
 ### 2. vultr_speedtest.py
-A comprehensive speed testing tool for Vultr global data centers and Taiwan HiNet servers.
+A comprehensive speed testing tool for Vultr, Linode global data centers and Taiwan HiNet servers.
 
 **Key Features:**
 - Download speed testing with real-time progress
@@ -33,6 +33,9 @@ A comprehensive speed testing tool for Vultr global data centers and Taiwan HiNe
 - Ping latency measurements
 - Both quick test and full download modes
 - Taiwan HiNet speed test integration
+- **NEW**: Linode global data centers support (11 locations)
+- **NEW**: Multi-language support (English, Traditional Chinese, Japanese)
+- **NEW**: Provider zone selection (--zone) to resolve server key conflicts
 
 ### 3. interactive_vultr_test.py
 An interactive menu-driven interface for the Vultr speed testing tool.
@@ -57,6 +60,11 @@ An interactive menu-driven interface for the Vultr speed testing tool.
 - **South America**: São Paulo, Santiago
 - **Africa**: Johannesburg
 - **Oceania**: Melbourne, Sydney
+
+### Linode Data Centers (11 locations) 🆕
+- **Asia**: Tokyo 2, Tokyo 3, Singapore, Mumbai
+- **North America**: Fremont, Newark, Atlanta, Dallas, Toronto
+- **Europe**: London, Frankfurt
 
 ### Taiwan HiNet
 - 250MB and 2GB test files from official HiNet speed test servers
@@ -110,11 +118,19 @@ python3 vultr_speedtest.py --server tokyo
 # Test multiple servers
 python3 vultr_speedtest.py --servers tokyo singapore new_york
 
-# Test all servers
+# Test all servers (including Vultr and Linode)
 python3 vultr_speedtest.py --all
 
 # Use 1GB test file with quick mode
 python3 vultr_speedtest.py --server tokyo --size 1GB --quick
+
+# 🆕 Specify provider zone to resolve server key conflicts
+python3 vultr_speedtest.py --server singapore --zone linode
+python3 vultr_speedtest.py --server singapore --zone vultr
+
+# 🆕 Multi-language support
+python3 vultr_speedtest.py --server tokyo --lang zh  # Traditional Chinese
+python3 vultr_speedtest.py --server tokyo --lang ja  # Japanese
 
 # List all available servers
 python3 vultr_speedtest.py --list
@@ -124,6 +140,9 @@ python3 vultr_speedtest.py --list
 ```bash
 # Launch interactive interface
 python3 interactive_vultr_test.py
+
+# 🆕 Launch with specific language and zone preference
+python3 interactive_vultr_test.py --lang zh --zone linode
 ```
 
 Then follow the menu prompts to:
@@ -200,12 +219,14 @@ Fastest server: Tokyo-Japan (89.5 Mbps)
 | `--server` | Test specific server | None |
 | `--servers` | Test multiple servers | None |
 | `--default` | Test default server set | False |
-| `--all` | Test all servers | False |
+| `--all` | Test all servers (Vultr + Linode + HiNet) | False |
 | `--size` | Test file size: 100MB/1GB | 100MB |
 | `--cooldown` | Delay between tests (seconds) | 2.0 |
 | `--timeout` | Test timeout (seconds) | 30 |
 | `--quick` | Quick test mode | False |
 | `--no-progress` | Hide progress bar | False |
+| `--zone` 🆕 | Provider zone: vultr/linode/hinet | None |
+| `--lang` 🆕 | Display language: en/zh/ja | en |
 
 ## 📁 Output Files
 
@@ -230,6 +251,9 @@ Fastest server: Tokyo-Japan (89.5 Mbps)
 3. **Test Frequency**: Avoid excessive testing to prevent rate limiting
 4. **Results Interpretation**: Results reflect current network conditions and may vary
 5. **Keyboard Interruption**: All tools support Ctrl+C for safe cancellation
+6. **🆕 Server Key Conflicts**: When multiple providers have servers with the same key (e.g., `singapore`), use `--zone` to specify which provider to test
+7. **🆕 Provider Priority**: Without `--zone`, default priority is HiNet → Linode → Vultr
+8. **🆕 Language Support**: All tools now support English, Traditional Chinese, and Japanese interfaces
 
 ## 🎯 Use Cases
 

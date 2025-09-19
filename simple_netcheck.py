@@ -14,70 +14,193 @@ from typing import Dict, List
 
 # 全球知名網站（用於測試連接性能）
 GLOBAL_SITES = [
-    {"label": "台北, 台灣", "host": "www.gov.tw", "region": "Asia"},
-    {"label": "東京, 日本", "host": "www.yahoo.co.jp", "region": "Asia"},
-    {"label": "首爾, 南韓", "host": "www.naver.com", "region": "Asia"},
-    {"label": "新加坡, 新加坡", "host": "www.straitstimes.com", "region": "Asia"},
-    {"label": "香港, 中國", "host": "www.scmp.com", "region": "Asia"},
-    {"label": "吉隆坡, 馬來西亞", "host": "www.thestar.com.my", "region": "Asia"},
-    {"label": "雪梨, 澳大利亞", "host": "www.abc.net.au", "region": "Oceania"},
-    {"label": "倫敦, 英國", "host": "www.bbc.com", "region": "Europe"},
-    {"label": "法蘭克福, 德國", "host": "www.spiegel.de", "region": "Europe"},
-    {"label": "紐約, 美國", "host": "www.nytimes.com", "region": "North America"},
-    {"label": "洛杉磯, 美國", "host": "www.latimes.com", "region": "North America"},
+    {"labels": {"en": "Taipei, Taiwan", "zh": "台北, 台灣", "ja": "台北, 台湾"}, "host": "www.gov.tw", "region": "Asia"},
+    {"labels": {"en": "Tokyo, Japan", "zh": "東京, 日本", "ja": "東京, 日本"}, "host": "www.yahoo.co.jp", "region": "Asia"},
+    {"labels": {"en": "Seoul, South Korea", "zh": "首爾, 南韓", "ja": "ソウル, 韓国"}, "host": "www.naver.com", "region": "Asia"},
+    {"labels": {"en": "Singapore", "zh": "新加坡, 新加坡", "ja": "シンガポール"}, "host": "www.straitstimes.com", "region": "Asia"},
+    {"labels": {"en": "Hong Kong, China", "zh": "香港, 中國", "ja": "香港, 中国"}, "host": "www.scmp.com", "region": "Asia"},
+    {"labels": {"en": "Kuala Lumpur, Malaysia", "zh": "吉隆坡, 馬來西亞", "ja": "クアラルンプール, マレーシア"}, "host": "www.thestar.com.my", "region": "Asia"},
+    {"labels": {"en": "Sydney, Australia", "zh": "雪梨, 澳大利亞", "ja": "シドニー, オーストラリア"}, "host": "www.abc.net.au", "region": "Oceania"},
+    {"labels": {"en": "London, UK", "zh": "倫敦, 英國", "ja": "ロンドン, イギリス"}, "host": "www.bbc.com", "region": "Europe"},
+    {"labels": {"en": "Frankfurt, Germany", "zh": "法蘭克福, 德國", "ja": "フランクフルト, ドイツ"}, "host": "www.spiegel.de", "region": "Europe"},
+    {"labels": {"en": "New York, USA", "zh": "紐約, 美國", "ja": "ニューヨーク, アメリカ"}, "host": "www.nytimes.com", "region": "North America"},
+    {"labels": {"en": "Los Angeles, USA", "zh": "洛杉磯, 美國", "ja": "ロサンゼルス, アメリカ"}, "host": "www.latimes.com", "region": "North America"},
 ]
 
 # Vultr 全球機房測試站點
 VULTR_SITES = [
     # 亞洲
-    {"label": "東京, 日本 (Vultr)", "host": "hnd-jp-ping.vultr.com", "region": "Asia"},
-    {"label": "大阪, 日本 (Vultr)", "host": "osk-jp-ping.vultr.com", "region": "Asia"},
-    {"label": "首爾, 韓國 (Vultr)", "host": "sel-kor-ping.vultr.com", "region": "Asia"},
-    {"label": "新加坡 (Vultr)", "host": "sgp-ping.vultr.com", "region": "Asia"},
-    {"label": "班加羅爾, 印度 (Vultr)", "host": "blr-in-ping.vultr.com", "region": "Asia"},
-    {"label": "德里NCR, 印度 (Vultr)", "host": "del-in-ping.vultr.com", "region": "Asia"},
-    {"label": "孟買, 印度 (Vultr)", "host": "bom-in-ping.vultr.com", "region": "Asia"},
-    {"label": "特拉維夫, 以色列 (Vultr)", "host": "tlv-il-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Tokyo, Japan (Vultr)", "zh": "東京, 日本 (Vultr)", "ja": "東京, 日本 (Vultr)"}, "host": "hnd-jp-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Osaka, Japan (Vultr)", "zh": "大阪, 日本 (Vultr)", "ja": "大阪, 日本 (Vultr)"}, "host": "osk-jp-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Seoul, South Korea (Vultr)", "zh": "首爾, 韓國 (Vultr)", "ja": "ソウル, 韓国 (Vultr)"}, "host": "sel-kor-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Singapore (Vultr)", "zh": "新加坡 (Vultr)", "ja": "シンガポール (Vultr)"}, "host": "sgp-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Bangalore, India (Vultr)", "zh": "班加羅爾, 印度 (Vultr)", "ja": "バンガロール, インド (Vultr)"}, "host": "blr-in-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Delhi NCR, India (Vultr)", "zh": "德里NCR, 印度 (Vultr)", "ja": "デリー, インド (Vultr)"}, "host": "del-in-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Mumbai, India (Vultr)", "zh": "孟買, 印度 (Vultr)", "ja": "ムンバイ, インド (Vultr)"}, "host": "bom-in-ping.vultr.com", "region": "Asia"},
+    {"labels": {"en": "Tel Aviv, Israel (Vultr)", "zh": "特拉維夫, 以色列 (Vultr)", "ja": "テルアビブ, イスラエル (Vultr)"}, "host": "tlv-il-ping.vultr.com", "region": "Asia"},
 
     # 歐洲
-    {"label": "倫敦, 英國 (Vultr)", "host": "lon-gb-ping.vultr.com", "region": "Europe"},
-    {"label": "曼徹斯特, 英國 (Vultr)", "host": "man-uk-ping.vultr.com", "region": "Europe"},
-    {"label": "法蘭克福, 德國 (Vultr)", "host": "fra-de-ping.vultr.com", "region": "Europe"},
-    {"label": "巴黎, 法國 (Vultr)", "host": "par-fr-ping.vultr.com", "region": "Europe"},
-    {"label": "阿姆斯特丹, 荷蘭 (Vultr)", "host": "ams-nl-ping.vultr.com", "region": "Europe"},
-    {"label": "華沙, 波蘭 (Vultr)", "host": "waw-pl-ping.vultr.com", "region": "Europe"},
-    {"label": "斯德哥爾摩, 瑞典 (Vultr)", "host": "sto-se-ping.vultr.com", "region": "Europe"},
-    {"label": "馬德里, 西班牙 (Vultr)", "host": "mad-es-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "London, UK (Vultr)", "zh": "倫敦, 英國 (Vultr)", "ja": "ロンドン, イギリス (Vultr)"}, "host": "lon-gb-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Manchester, UK (Vultr)", "zh": "曼徹斯特, 英國 (Vultr)", "ja": "マンチェスター, イギリス (Vultr)"}, "host": "man-uk-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Frankfurt, Germany (Vultr)", "zh": "法蘭克福, 德國 (Vultr)", "ja": "フランクフルト, ドイツ (Vultr)"}, "host": "fra-de-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Paris, France (Vultr)", "zh": "巴黎, 法國 (Vultr)", "ja": "パリ, フランス (Vultr)"}, "host": "par-fr-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Amsterdam, Netherlands (Vultr)", "zh": "阿姆斯特丹, 荷蘭 (Vultr)", "ja": "アムステルダム, オランダ (Vultr)"}, "host": "ams-nl-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Warsaw, Poland (Vultr)", "zh": "華沙, 波蘭 (Vultr)", "ja": "ワルシャワ, ポーランド (Vultr)"}, "host": "waw-pl-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Stockholm, Sweden (Vultr)", "zh": "斯德哥爾摩, 瑞典 (Vultr)", "ja": "ストックホルム, スウェーデン (Vultr)"}, "host": "sto-se-ping.vultr.com", "region": "Europe"},
+    {"labels": {"en": "Madrid, Spain (Vultr)", "zh": "馬德里, 西班牙 (Vultr)", "ja": "マドリード, スペイン (Vultr)"}, "host": "mad-es-ping.vultr.com", "region": "Europe"},
 
     # 北美
-    {"label": "亞特蘭大, 美國 (Vultr)", "host": "ga-us-ping.vultr.com", "region": "North America"},
-    {"label": "芝加哥, 美國 (Vultr)", "host": "il-us-ping.vultr.com", "region": "North America"},
-    {"label": "達拉斯, 美國 (Vultr)", "host": "tx-us-ping.vultr.com", "region": "North America"},
-    {"label": "火奴魯魯, 美國 (Vultr)", "host": "hon-hi-us-ping.vultr.com", "region": "North America"},
-    {"label": "洛杉磯, 美國 (Vultr)", "host": "lax-ca-us-ping.vultr.com", "region": "North America"},
-    {"label": "邁阿密, 美國 (Vultr)", "host": "fl-us-ping.vultr.com", "region": "North America"},
-    {"label": "紐約(新澤西), 美國 (Vultr)", "host": "nj-us-ping.vultr.com", "region": "North America"},
-    {"label": "西雅圖, 美國 (Vultr)", "host": "wa-us-ping.vultr.com", "region": "North America"},
-    {"label": "矽谷, 美國 (Vultr)", "host": "sjo-ca-us-ping.vultr.com", "region": "North America"},
-    {"label": "多倫多, 加拿大 (Vultr)", "host": "tor-ca-ping.vultr.com", "region": "North America"},
-    {"label": "墨西哥城, 墨西哥 (Vultr)", "host": "mex-mx-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Atlanta, USA (Vultr)", "zh": "亞特蘭大, 美國 (Vultr)", "ja": "アトランタ, アメリカ (Vultr)"}, "host": "ga-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Chicago, USA (Vultr)", "zh": "芝加哥, 美國 (Vultr)", "ja": "シカゴ, アメリカ (Vultr)"}, "host": "il-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Dallas, USA (Vultr)", "zh": "達拉斯, 美國 (Vultr)", "ja": "ダラス, アメリカ (Vultr)"}, "host": "tx-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Honolulu, USA (Vultr)", "zh": "火奴魯魯, 美國 (Vultr)", "ja": "ホノルル, アメリカ (Vultr)"}, "host": "hon-hi-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Los Angeles, USA (Vultr)", "zh": "洛杉磯, 美國 (Vultr)", "ja": "ロサンゼルス, アメリカ (Vultr)"}, "host": "lax-ca-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Miami, USA (Vultr)", "zh": "邁阿密, 美國 (Vultr)", "ja": "マイアミ, アメリカ (Vultr)"}, "host": "fl-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "New York (NJ), USA (Vultr)", "zh": "紐約(新澤西), 美國 (Vultr)", "ja": "ニューヨーク(NJ), アメリカ (Vultr)"}, "host": "nj-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Seattle, USA (Vultr)", "zh": "西雅圖, 美國 (Vultr)", "ja": "シアトル, アメリカ (Vultr)"}, "host": "wa-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Silicon Valley, USA (Vultr)", "zh": "矽谷, 美國 (Vultr)", "ja": "シリコンバレー, アメリカ (Vultr)"}, "host": "sjo-ca-us-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Toronto, Canada (Vultr)", "zh": "多倫多, 加拿大 (Vultr)", "ja": "トロント, カナダ (Vultr)"}, "host": "tor-ca-ping.vultr.com", "region": "North America"},
+    {"labels": {"en": "Mexico City, Mexico (Vultr)", "zh": "墨西哥城, 墨西哥 (Vultr)", "ja": "メキシコシティ, メキシコ (Vultr)"}, "host": "mex-mx-ping.vultr.com", "region": "North America"},
 
     # 南美
-    {"label": "聖保羅, 巴西 (Vultr)", "host": "sao-br-ping.vultr.com", "region": "South America"},
-    {"label": "聖地牙哥, 智利 (Vultr)", "host": "scl-cl-ping.vultr.com", "region": "South America"},
+    {"labels": {"en": "São Paulo, Brazil (Vultr)", "zh": "聖保羅, 巴西 (Vultr)", "ja": "サンパウロ, ブラジル (Vultr)"}, "host": "sao-br-ping.vultr.com", "region": "South America"},
+    {"labels": {"en": "Santiago, Chile (Vultr)", "zh": "聖地牙哥, 智利 (Vultr)", "ja": "サンティアゴ, チリ (Vultr)"}, "host": "scl-cl-ping.vultr.com", "region": "South America"},
 
     # 非洲
-    {"label": "約翰內斯堡, 南非 (Vultr)", "host": "jnb-za-ping.vultr.com", "region": "Africa"},
+    {"labels": {"en": "Johannesburg, South Africa (Vultr)", "zh": "約翰內斯堡, 南非 (Vultr)", "ja": "ヨハネスブルグ, 南アフリカ (Vultr)"}, "host": "jnb-za-ping.vultr.com", "region": "Africa"},
 
     # 澳洲
-    {"label": "墨爾本, 澳大利亞 (Vultr)", "host": "mel-au-ping.vultr.com", "region": "Oceania"},
-    {"label": "雪梨, 澳大利亞 (Vultr)", "host": "syd-au-ping.vultr.com", "region": "Oceania"},
+    {"labels": {"en": "Melbourne, Australia (Vultr)", "zh": "墨爾本, 澳大利亞 (Vultr)", "ja": "メルボルン, オーストラリア (Vultr)"}, "host": "mel-au-ping.vultr.com", "region": "Oceania"},
+    {"labels": {"en": "Sydney, Australia (Vultr)", "zh": "雪梨, 澳大利亞 (Vultr)", "ja": "シドニー, オーストラリア (Vultr)"}, "host": "syd-au-ping.vultr.com", "region": "Oceania"},
 ]
 
 # 合併所有測試站點
 ALL_SITES = GLOBAL_SITES + VULTR_SITES
 
-def test_connection_speed(host: str, timeout: float = 10.0) -> Dict:
+# 多語言支持
+LANGUAGES = {
+    "en": {
+        "title": "🌐 Simple Network Connection Test",
+        "subtitle": "📍 Testing connection performance to global websites",
+        "testing": "Testing",
+        "score": "Score",
+        "interrupted": "⏹️  Test interrupted by user",
+        "completed_tests": "completed",
+        "no_tests": "❌ No tests completed, exiting",
+        "results_ranking": "🏆 Test Results Ranking (sorted by total latency):",
+        "rank": "Rank",
+        "location": "Location",
+        "total_latency": "Total",
+        "dns": "DNS",
+        "tcp": "TCP",
+        "http": "HTTP",
+        "best_connection": "🥇 Best connection",
+        "region_stats": "📊 Regional Statistics:",
+        "avg_latency": "Average latency",
+        "sites": "sites",
+        "no_success": "❌ No successful test results",
+        "saved_to": "💾 Results saved to",
+        "available_sites": "Available test sites:",
+        "no_region_found": "❌ No sites found for region",
+        "dns_failed": "DNS resolution failed",
+        "tcp_failed": "TCP connection failed",
+        "timeout": "Connection timeout",
+        "connection_error": "Connection error",
+        # Region names
+        "Asia": "Asia",
+        "Europe": "Europe",
+        "North America": "North America",
+        "South America": "South America",
+        "Oceania": "Oceania",
+        "Africa": "Africa"
+    },
+    "zh": {
+        "title": "🌐 簡單網路連接測試",
+        "subtitle": "📍 測試全球主要網站的連接性能",
+        "testing": "測試",
+        "score": "評分",
+        "interrupted": "⏹️  測試被使用者中斷",
+        "completed_tests": "已完成",
+        "no_tests": "❌ 沒有完成任何測試，程式結束",
+        "results_ranking": "🏆 測試結果排行 (按總延遲排序):",
+        "rank": "排名",
+        "location": "地點",
+        "total_latency": "總延遲",
+        "dns": "DNS",
+        "tcp": "TCP",
+        "http": "HTTP",
+        "best_connection": "🥇 最佳連接",
+        "region_stats": "📊 地區統計:",
+        "avg_latency": "平均延遲",
+        "sites": "個站點",
+        "no_success": "❌ 沒有成功的測試結果",
+        "saved_to": "💾 結果已保存到",
+        "available_sites": "可用的測試站點：",
+        "no_region_found": "❌ 沒有找到地區",
+        "dns_failed": "DNS 解析失敗",
+        "tcp_failed": "TCP 連接失敗",
+        "timeout": "連接超時",
+        "connection_error": "連接錯誤",
+        # Region names
+        "Asia": "亞洲",
+        "Europe": "歐洲",
+        "North America": "北美洲",
+        "South America": "南美洲",
+        "Oceania": "大洋洲",
+        "Africa": "非洲"
+    },
+    "ja": {
+        "title": "🌐 シンプルネットワーク接続テスト",
+        "subtitle": "📍 世界の主要サイトへの接続性能をテスト",
+        "testing": "テスト中",
+        "score": "スコア",
+        "interrupted": "⏹️  ユーザーによってテストが中断されました",
+        "completed_tests": "完了",
+        "no_tests": "❌ テストが完了しませんでした。プログラムを終了します",
+        "results_ranking": "🏆 テスト結果ランキング（総レイテンシ順）:",
+        "rank": "順位",
+        "location": "場所",
+        "total_latency": "総遅延",
+        "dns": "DNS",
+        "tcp": "TCP",
+        "http": "HTTP",
+        "best_connection": "🥇 最良の接続",
+        "region_stats": "📊 地域統計:",
+        "avg_latency": "平均レイテンシ",
+        "sites": "サイト",
+        "no_success": "❌ 成功したテスト結果がありません",
+        "saved_to": "💾 結果を保存しました",
+        "available_sites": "利用可能なテストサイト：",
+        "no_region_found": "❌ 地域が見つかりません",
+        "dns_failed": "DNS解決に失敗",
+        "tcp_failed": "TCP接続に失敗",
+        "timeout": "接続タイムアウト",
+        "connection_error": "接続エラー",
+        # Region names
+        "Asia": "アジア",
+        "Europe": "ヨーロッパ",
+        "North America": "北アメリカ",
+        "South America": "南アメリカ",
+        "Oceania": "オセアニア",
+        "Africa": "アフリカ"
+    }
+}
+
+def get_text(key: str, lang: str = "en") -> str:
+    """Get localized text based on language"""
+    return LANGUAGES.get(lang, LANGUAGES["en"]).get(key, LANGUAGES["en"][key])
+
+def get_localized_site_info(site: Dict, lang: str = "en") -> str:
+    """Get localized site information string"""
+    region_localized = get_text(site['region'], lang)
+    site_label = site['labels'].get(lang, site['labels'].get('en', 'Unknown'))
+    return f"{site_label} ({region_localized}) - {site['host']}"
+
+def get_site_label(site: Dict, lang: str = "en") -> str:
+    """Get localized site label"""
+    return site['labels'].get(lang, site['labels'].get('en', 'Unknown'))
+
+def test_connection_speed(host: str, timeout: float = 10.0, lang: str = "en") -> Dict:
     """測試連接速度和延遲"""
     try:
         # 1. DNS 解析時間
@@ -96,7 +219,7 @@ def test_connection_speed(host: str, timeout: float = 10.0) -> Dict:
         if result != 0:
             return {
                 "success": False,
-                "error": "TCP 連接失敗",
+                "error": get_text("tcp_failed", lang),
                 "dns_ms": dns_time,
                 "tcp_ms": 0,
                 "http_ms": 0,
@@ -137,7 +260,7 @@ def test_connection_speed(host: str, timeout: float = 10.0) -> Dict:
     except socket.gaierror:
         return {
             "success": False,
-            "error": "DNS 解析失敗",
+            "error": get_text("dns_failed", lang),
             "dns_ms": 0,
             "tcp_ms": 0,
             "http_ms": 0,
@@ -177,13 +300,15 @@ def calculate_score(result: Dict) -> float:
         return 10
 
 def main():
-    parser = argparse.ArgumentParser(description="簡單網路連接測試")
-    parser.add_argument("--region", help="只測試特定地區")
-    parser.add_argument("--timeout", type=float, default=10.0, help="連接超時時間")
-    parser.add_argument("--output", help="保存結果為 JSON")
-    parser.add_argument("--list", action="store_true", help="列出所有測試站點")
+    parser = argparse.ArgumentParser(description="Simple Network Connection Test")
+    parser.add_argument("--region", help="Test specific region only")
+    parser.add_argument("--timeout", type=float, default=10.0, help="Connection timeout")
+    parser.add_argument("--output", help="Save results as JSON")
+    parser.add_argument("--list", action="store_true", help="List all test sites")
     parser.add_argument("--sites", choices=["global", "vultr", "all"], default="all",
-                       help="選擇測試站點類型: global(知名網站), vultr(Vultr機房), all(全部)")
+                       help="Choose test site type: global(famous websites), vultr(Vultr datacenters), all(all sites)")
+    parser.add_argument("--lang", choices=["en", "zh", "ja"], default="en",
+                       help="Display language: en(English), zh(Traditional Chinese), ja(Japanese)")
 
     args = parser.parse_args()
 
@@ -196,9 +321,9 @@ def main():
         test_sites = ALL_SITES
 
     if args.list:
-        print("可用的測試站點：")
+        print(get_text("available_sites", args.lang))
         for site in test_sites:
-            print(f"  {site['label']} ({site['region']}) - {site['host']}")
+            print(f"  {get_localized_site_info(site, args.lang)}")
         return
 
     # 過濾站點
@@ -206,23 +331,23 @@ def main():
     if args.region:
         sites_to_test = [s for s in test_sites if s['region'] == args.region]
         if not sites_to_test:
-            print(f"❌ 沒有找到地區 '{args.region}' 的站點")
+            print(f"{get_text('no_region_found', args.lang)} '{args.region}'")
             return
 
-    print("🌐 簡單網路連接測試")
-    print("📍 測試全球主要網站的連接性能")
+    print(get_text("title", args.lang))
+    print(get_text("subtitle", args.lang))
     print("=" * 60)
 
     results = []
 
     try:
         for i, site in enumerate(sites_to_test, 1):
-            label = site['label']
+            label = get_site_label(site, args.lang)
             host = site['host']
 
-            print(f"[{i:2}/{len(sites_to_test)}] 測試 {label:<20}", end="", flush=True)
+            print(f"[{i:2}/{len(sites_to_test)}] {get_text('testing', args.lang)} {label:<20}", end="", flush=True)
 
-            result = test_connection_speed(host, args.timeout)
+            result = test_connection_speed(host, args.timeout, args.lang)
             result.update({
                 "label": label,
                 "host": host,
@@ -233,25 +358,25 @@ def main():
             results.append(result)
 
             if result["success"]:
-                print(f" ✅ {result['total_ms']:6.1f}ms (評分: {result['score']:3.0f})")
+                print(f" ✅ {result['total_ms']:6.1f}ms ({get_text('score', args.lang)}: {result['score']:3.0f})")
             else:
                 print(f" ❌ {result['error']}")
 
     except KeyboardInterrupt:
-        print(f"\n\n⏹️  測試被使用者中斷 (已完成 {len(results)}/{len(sites_to_test)} 個測試)")
+        print(f"\n\n{get_text('interrupted', args.lang)} ({len(results)}/{len(sites_to_test)} {get_text('completed_tests', args.lang)})")
         if len(results) == 0:
-            print("❌ 沒有完成任何測試，程式結束")
+            print(get_text('no_tests', args.lang))
             return
 
     # 顯示總結
     print("\n" + "=" * 60)
-    print("🏆 測試結果排行 (按總延遲排序):")
+    print(get_text("results_ranking", args.lang))
 
     successful_tests = [r for r in results if r['success']]
     if successful_tests:
         successful_tests.sort(key=lambda x: x['total_ms'])
 
-        print(f"{'排名':<4} {'地點':<20} {'總延遲':<10} {'DNS':<8} {'TCP':<8} {'HTTP':<8} {'評分'}")
+        print(f"{get_text('rank', args.lang):<4} {get_text('location', args.lang):<20} {get_text('total_latency', args.lang):<10} {get_text('dns', args.lang):<8} {get_text('tcp', args.lang):<8} {get_text('http', args.lang):<8} {get_text('score', args.lang)}")
         print("-" * 70)
 
         for rank, result in enumerate(successful_tests, 1):
@@ -264,10 +389,10 @@ def main():
 
         # 顯示最佳連接
         best = successful_tests[0]
-        print(f"\n🥇 最佳連接: {best['label']} ({best['total_ms']:.1f}ms)")
+        print(f"\n{get_text('best_connection', args.lang)}: {best['label']} ({best['total_ms']:.1f}ms)")
 
         # 按地區統計
-        print(f"\n📊 地區統計:")
+        print(f"\n{get_text('region_stats', args.lang)}")
         regions = {}
         for result in successful_tests:
             region = result['region']
@@ -277,16 +402,17 @@ def main():
 
         for region, region_results in regions.items():
             avg_latency = sum(r['total_ms'] for r in region_results) / len(region_results)
-            print(f"  {region:<15}: 平均延遲 {avg_latency:6.1f}ms ({len(region_results)} 個站點)")
+            region_localized = get_text(region, args.lang)
+            print(f"  {region_localized:<15}: {get_text('avg_latency', args.lang)} {avg_latency:6.1f}ms ({len(region_results)} {get_text('sites', args.lang)})")
 
     else:
-        print("❌ 沒有成功的測試結果")
+        print(get_text('no_success', args.lang))
 
     # 保存結果
     if args.output:
         with open(args.output, 'w', encoding='utf-8') as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
-        print(f"\n💾 結果已保存到 {args.output}")
+        print(f"\n{get_text('saved_to', args.lang)} {args.output}")
 
 if __name__ == "__main__":
     main()
